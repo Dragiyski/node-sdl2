@@ -18,7 +18,7 @@ endif()
 get_target_property(SDL2_INTERFACE_INCLUDE_DIRECTORIES SDL2::SDL2-static INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(SDL2_INTERFACE_LINK_LIBRARIES SDL2::SDL2-static INTERFACE_LINK_LIBRARIES)
 
-separate_arguments(SDL2_INTERFACE_LINK_LIBRARIES NATIVE_COMMAND "${SDL2_INTERFACE_LINK_LIBRARIES}")
+# separate_arguments(SDL2_INTERFACE_LINK_LIBRARIES NATIVE_COMMAND "${SDL2_INTERFACE_LINK_LIBRARIES}")
 
 # For some reason this is added as an interface to SDL2.
 # However, NodeJS addons will definitely have an undefined symbol,

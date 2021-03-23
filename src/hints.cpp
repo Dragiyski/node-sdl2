@@ -1,6 +1,7 @@
 #include "hints.hpp"
 #include "js-helper.h"
 #include "sdl-helper.h"
+#include "string-helper.h"
 #include <SDL.h>
 #include <SDL_hints.h>
 #include <map>
@@ -10,21 +11,10 @@
 namespace node_sdl2 {
     v8::Maybe<void> load_SDL_HINT_PRIORITY(v8::Local<v8::Context> context, v8::Local<v8::Object> target) {
         v8::HandleScope scope(context->GetIsolate());
-        {
-            JS_EXECUTE_RETURN_HANDLE(VOID_NOTHING, v8::String, name, ToString(context, "DEFAULT"));
-            v8::Local<v8::Integer> value = v8::Integer::New(scope.GetIsolate(), SDL_HINT_DEFAULT);
-            JS_EXECUTE_IGNORE(VOID_NOTHING, target->DefineOwnProperty(context, name, value, static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly)));
-        }
-        {
-            JS_EXECUTE_RETURN_HANDLE(VOID_NOTHING, v8::String, name, ToString(context, "NORMAL"));
-            v8::Local<v8::Integer> value = v8::Integer::New(scope.GetIsolate(), SDL_HINT_NORMAL);
-            JS_EXECUTE_IGNORE(VOID_NOTHING, target->DefineOwnProperty(context, name, value, static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly)));
-        }
-        {
-            JS_EXECUTE_RETURN_HANDLE(VOID_NOTHING, v8::String, name, ToString(context, "OVERRIDE"));
-            v8::Local<v8::Integer> value = v8::Integer::New(scope.GetIsolate(), SDL_HINT_OVERRIDE);
-            JS_EXECUTE_IGNORE(VOID_NOTHING, target->DefineOwnProperty(context, name, value, static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly)));
-        }
+        using const_string::operator""_const;
+        JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_HINT", SDL_HINT_DEFAULT);
+        JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_HINT", SDL_HINT_NORMAL);
+        JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_HINT", SDL_HINT_OVERRIDE);
         return v8::JustVoid();
     }
 

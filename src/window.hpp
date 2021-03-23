@@ -32,6 +32,9 @@ namespace node_sdl2 {
         v8::Global<v8::Object> m_this;
     };
 
+    void jsEnableScreenSaver(const v8::FunctionCallbackInfo<v8::Value> &info);
+    void jsDisableScreenSaver(const v8::FunctionCallbackInfo<v8::Value> &info);
+
 }
 
 

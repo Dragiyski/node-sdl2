@@ -82,7 +82,10 @@ namespace {
             if (string_second.IsEmpty()) {
                 return v8::MaybeLocal<v8::String>();
             }
-            return ForEach<v8::Local<v8::String>, T...>::ToString(context, v8::String::Concat(context->GetIsolate(), string_first.ToLocalChecked(), string_second.ToLocalChecked()), rest...);
+            return ForEach<
+                v8::Local<v8::String>,
+                T...
+            >::ToString(context, v8::String::Concat(context->GetIsolate(), string_first.ToLocalChecked(), string_second.ToLocalChecked()), rest...);
         }
 
         static v8::MaybeLocal<v8::String> ToDetailString(v8::Local<v8::Context> context, First first, Second second, T ... rest) {
@@ -94,17 +97,30 @@ namespace {
             if (string_second.IsEmpty()) {
                 return v8::MaybeLocal<v8::String>();
             }
-            return ForEach<v8::Local<v8::String>, T...>::ToDetailString(context, v8::String::Concat(context->GetIsolate(), string_first.ToLocalChecked(), string_second.ToLocalChecked()), rest...);
+            return ForEach<
+                v8::Local<v8::String>,
+                T...
+            >::ToDetailString(context, v8::String::Concat(context->GetIsolate(), string_first.ToLocalChecked(), string_second.ToLocalChecked()), rest...);
         }
     };
 
     template<typename ... T>
     struct ForEach<v8::Local<v8::String>, v8::Local<v8::String>, T...> {
-        static v8::Local<v8::String> ToString(v8::Local<v8::Context> context, v8::Local<v8::String> first, v8::Local<v8::String> second, v8::Local<T> ... rest) {
+        static v8::Local<v8::String> ToString(
+            v8::Local<v8::Context> context,
+            v8::Local<v8::String> first,
+            v8::Local<v8::String> second,
+            v8::Local<T> ... rest
+        ) {
             return ForEach<v8::String, T...>::ToString(context, v8::String::Concat(context->GetIsolate(), first, second), rest...);
         }
 
-        static v8::Local<v8::String> ToDetailString(v8::Local<v8::Context> context, v8::Local<v8::String> first, v8::Local<v8::String> second, v8::Local<T> ... rest) {
+        static v8::Local<v8::String> ToDetailString(
+            v8::Local<v8::Context> context,
+            v8::Local<v8::String> first,
+            v8::Local<v8::String> second,
+            v8::Local<T> ... rest
+        ) {
             return ForEach<v8::String, T...>::ToDetailString(context, v8::String::Concat(context->GetIsolate(), first, second), rest...);
         }
 
@@ -156,7 +172,7 @@ namespace {
         }
     };
 
-    template <>
+    template<>
     struct ForEach<v8::Local<v8::Number>> {
         static v8::MaybeLocal<v8::String> ToString(v8::Local<v8::Context> context, v8::Local<v8::Number> value) {
             return value->ToString(context);

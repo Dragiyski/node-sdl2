@@ -145,18 +145,13 @@ namespace node_sdl2 {
             JS_THROW_INVALID_ARG_TYPE(info, 0, "[object SDL_Window]");
         }
         v8::Local<v8::Object> jsThis = info[0].As<v8::Object>();
-        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::FunctionTemplate, constructorTemplate, Template(scope.GetIsolate()));
-        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Function, constructor, constructorTemplate->GetFunction(context));
-        JS_EXECUTE_RETURN(NOTHING, bool, isInstanceOf, jsThis->InstanceOf(context, constructor));
-        if (!isInstanceOf) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "[object SDL_Window]");
-        }
-        while (jsThis->InternalFieldCount() < 1) {
-            JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Value, valuePrototype, jsThis->GetPrototype());
-            if (!valuePrototype->IsObject()) {
+        if (jsThis->InternalFieldCount() < 1) {
+            JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::FunctionTemplate, constructor, Template(scope.GetIsolate()));
+            if (!constructor->HasInstance(jsThis)) {
                 JS_THROW_INVALID_ARG_TYPE(info, 0, "[object SDL_Window]");
+            } else {
+                JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::String, message, ToDetailString(context, "Object ", jsThis, " is not valid SDL_Window"));
             }
-            jsThis = valuePrototype.As<v8::Object>();
         }
         Window *window = reinterpret_cast<Window *>(jsThis->GetAlignedPointerFromInternalField(0));
         if (window->m_internal != nullptr) {
@@ -179,18 +174,8 @@ namespace node_sdl2 {
             return;
         }
         v8::Local<v8::Object> jsThis = info[0].As<v8::Object>();
-        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::FunctionTemplate, constructorTemplate, Template(scope.GetIsolate()));
-        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Function, constructor, constructorTemplate->GetFunction(context));
-        JS_EXECUTE_RETURN(NOTHING, bool, isInstanceOf, jsThis->InstanceOf(context, constructor));
-        if (!isInstanceOf) {
+        if(jsThis->InternalFieldCount() < 1) {
             return;
-        }
-        while (jsThis->InternalFieldCount() < 1) {
-            JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Value, valuePrototype, jsThis->GetPrototype());
-            if (!valuePrototype->IsObject()) {
-                return;
-            }
-            jsThis = valuePrototype.As<v8::Object>();
         }
         Window *window = reinterpret_cast<Window *>(jsThis->GetAlignedPointerFromInternalField(0));
         info.GetReturnValue().Set(window->m_internal != nullptr);

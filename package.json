@@ -1,0 +1,7 @@
+{
+  "name": "@dragiysli/node-sdl2",
+  "version": "1.0.0",
+  "dependencies": {
+    "cmake-js": "^6.1.0"
+  }
+}

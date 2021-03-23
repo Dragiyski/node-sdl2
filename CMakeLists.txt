@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(node-sdl2)
+
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
+find_package(SDL2)
+
+if(NOT SDL2_FOUND)
+    message(FATAL_ERROR "Package SDL2 not found: node-sdl2 is just an adapter for libSDL2")
+endif()
+
+if(SDL2_CONFIG)
+    message(STATUS "SDL2: Using config ${SDL2_CONFIG}")
+    include("${SDL2_CONFIG}")
+endif()
+
+get_target_property(SDL2_INTERFACE_INCLUDE_DIRECTORIES SDL2::SDL2-static INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property(SDL2_INTERFACE_LINK_LIBRARIES SDL2::SDL2-static INTERFACE_LINK_LIBRARIES)
+
+separate_arguments(SDL2_INTERFACE_LINK_LIBRARIES NATIVE_COMMAND "${SDL2_INTERFACE_LINK_LIBRARIES}")
+
+# For some reason this is added as an interface to SDL2.
+# However, NodeJS addons will definitely have an undefined symbol,
+# and cannot be linked as static library, but they can still be
+# open from the NodeJS's dlopen().
+list(REMOVE_ITEM SDL2_INTERFACE_LINK_LIBRARIES "-Wl,--no-undefined")
+list(REMOVE_ITEM SDL2_INTERFACE_LINK_LIBRARIES "-Wl,-undefined,error")
+
+message(STATUS "SDL2_INTERFACE_LINK_LIBRARIES: ${SDL2_INTERFACE_LINK_LIBRARIES}")
+
+file(GLOB SOURCE_FILES "./src/*.cpp")
+add_library(${PROJECT_NAME} MODULE ${SOURCE_FILES} ${CMAKE_JS_SRC})
+set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_EXTENSIONS OFF)
+
+target_compile_definitions(${PROJECT_NAME} PUBLIC SDL_MAIN_HANDLED)
+
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${SDL2_INTERFACE_INCLUDE_DIRECTORIES} ${CMAKE_JS_INC})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SDL2_INTERFACE_LINK_LIBRARIES} ${CMAKE_JS_LIB} SDL2)

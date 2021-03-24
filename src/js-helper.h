@@ -88,6 +88,24 @@ for (int i = 0; i < length - offset; ++i) { \
         JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, value, attributes)); \
     }
 
+#define JS_DEFINE_FLOAT_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, v8::Number::New(context->GetIsolate(), srcValue), attributes)); \
+    }
+
+#define JS_DEFINE_INT64_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, v8::BigInt::New(context->GetIsolate(), srcValue), attributes)); \
+    }
+
+#define JS_DEFINE_UINT64_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, v8::Integer::NewFromUnsigned(context->GetIsolate(), srcValue), attributes)); \
+    }
+
 #define JS_DEFINE_UINT(bailout, context, target, srcName, srcValue) JS_DEFINE_UINT_ATTR(bailout, context, target, srcName, srcValue, v8::None)
 #define JS_DEFINE_INT(bailout, context, target, srcName, srcValue) JS_DEFINE_INT_ATTR(bailout, context, target, srcName, srcValue, v8::None)
 #define JS_DEFINE_STRING(bailout, context, target, srcName, srcValue) JS_DEFINE_STRING_ATTR(bailout, context, target, srcName, srcValue, v8::None)

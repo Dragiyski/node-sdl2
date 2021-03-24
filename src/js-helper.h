@@ -66,6 +66,32 @@ for (int i = 0; i < length - offset; ++i) { \
     scope.GetIsolate()->ThrowException(error); \
     return;
 
+#define JS_PROPERTY_ATTRIBUTE_CONSTANT (static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::ReadOnly))
+#define JS_PROPERTY_ATTRIBUTE_FROZEN (static_cast<v8::PropertyAttribute>(v8::DontDelete | v8::DontEnum | v8::ReadOnly))
+
+#define JS_DEFINE_UINT_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, v8::Integer::NewFromUnsigned(context->GetIsolate(), srcValue), attributes)); \
+    }
+
+#define JS_DEFINE_INT_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, v8::Integer::New(context->GetIsolate(), srcValue), attributes)); \
+    }
+
+#define JS_DEFINE_STRING_ATTR(bailout, context, target, srcName, srcValue, attributes) \
+    { \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, name, ToString(context, srcName)); \
+        JS_EXECUTE_RETURN_HANDLE(bailout, v8::String, value, ToString(context, srcValue)); \
+        JS_EXECUTE_IGNORE(bailout, target->DefineOwnProperty(context, name, value, attributes)); \
+    }
+
+#define JS_DEFINE_UINT(bailout, context, target, srcName, srcValue) JS_DEFINE_UINT_ATTR(bailout, context, target, srcName, srcValue, v8::None)
+#define JS_DEFINE_INT(bailout, context, target, srcName, srcValue) JS_DEFINE_INT_ATTR(bailout, context, target, srcName, srcValue, v8::None)
+#define JS_DEFINE_STRING(bailout, context, target, srcName, srcValue) JS_DEFINE_STRING_ATTR(bailout, context, target, srcName, srcValue, v8::None)
+
 namespace {
     template<typename ...T>
     struct ForEach {

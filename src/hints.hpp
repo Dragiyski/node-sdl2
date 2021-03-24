@@ -5,6 +5,7 @@
 
 namespace node_sdl2 {
     v8::Maybe<void> load_SDL_HINT_PRIORITY(v8::Local<v8::Context> context, v8::Local<v8::Object> target);
+    v8::Maybe<void> export_SDL2_Hint(v8::Local<v8::Context> context, v8::Local<v8::Object> exports);
     void js_SetHint(const v8::FunctionCallbackInfo<v8::Value> &info);
     void js_SetHintWithPriority(const v8::FunctionCallbackInfo<v8::Value> &info);
     void js_GetHint(const v8::FunctionCallbackInfo<v8::Value> &info);

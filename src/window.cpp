@@ -8,7 +8,7 @@ namespace node_sdl2 {
     std::map<v8::Isolate *, v8::Eternal<v8::FunctionTemplate>> Window::template_map;
     std::recursive_mutex Window::template_map_mutex;
 
-    v8::Maybe<void> Window::load_SDL2_WINDOW(v8::Local<v8::Context> context, v8::Local<v8::Object> target) {
+    v8::Maybe<void> Window::load_SDL_WINDOW(v8::Local<v8::Context> context, v8::Local<v8::Object> target) {
         using const_string::operator ""_const;
         v8::HandleScope scope(context->GetIsolate());
         JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_WINDOW", SDL_WINDOW_FULLSCREEN);
@@ -35,6 +35,16 @@ namespace node_sdl2 {
         return v8::JustVoid();
     }
 
+    v8::Maybe<void> Window::export_SDL2_Window(v8::Local<v8::Context> context, v8::Local<v8::Object> exports) {
+        using const_string::operator""_const;
+        v8::Isolate *isolate = context->GetIsolate();
+        v8::HandleScope scope(isolate);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_CreateWindow, 6);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_DeleteWindow, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_IsWindow, 1);
+        return v8::JustVoid();
+    }
+
     v8::MaybeLocal<v8::FunctionTemplate> Window::Template(v8::Isolate *isolate) {
         v8::EscapableHandleScope scope(isolate);
         std::scoped_lock lock(template_map_mutex);
@@ -49,28 +59,10 @@ namespace node_sdl2 {
         }
 
         v8::Local<v8::Context> context = isolate->GetCurrentContext();
-        v8::Local<v8::FunctionTemplate> constructor = v8::FunctionTemplate::New(isolate);
+        v8::Local<v8::FunctionTemplate> constructor = v8::FunctionTemplate::New(isolate, js_Constructor);
         JS_EXECUTE_RETURN_HANDLE(JS_NOTHING(v8::FunctionTemplate), v8::String, class_name, ToString(context, "SDL_Window"));
         constructor->SetClassName(class_name);
         constructor->InstanceTemplate()->SetInternalFieldCount(1);
-
-        {
-            JS_EXECUTE_RETURN_HANDLE(JS_NOTHING(v8::FunctionTemplate), v8::String, name, ToString(context, "createWindow"));
-            v8::Local<v8::FunctionTemplate> method = v8::FunctionTemplate::New(isolate, CreateWindow, v8::Local<v8::Value>(), v8::Local<v8::Signature>(), 6, v8::ConstructorBehavior::kThrow);
-            constructor->Set(name, method, static_cast<v8::PropertyAttribute>(v8::DontEnum | v8::DontDelete | v8::ReadOnly));
-        }
-        {
-            JS_EXECUTE_RETURN_HANDLE(JS_NOTHING(v8::FunctionTemplate), v8::String, name, ToString(context, "deleteWindow"));
-            v8::Local<v8::FunctionTemplate> method = v8::FunctionTemplate::New(isolate, DeleteWindow, v8::Local<v8::Value>(), v8::Local<v8::Signature>(), 1, v8::ConstructorBehavior::kThrow);
-            constructor->Set(name, method, static_cast<v8::PropertyAttribute>(v8::DontEnum | v8::DontDelete | v8::ReadOnly));
-        }
-        {
-            JS_EXECUTE_RETURN_HANDLE(JS_NOTHING(v8::FunctionTemplate), v8::String, name, ToString(context, "isWindow"));
-            v8::Local<v8::FunctionTemplate> method = v8::FunctionTemplate::New(isolate, IsWindow, v8::Local<v8::Value>(), v8::Local<v8::Signature>(), 1, v8::ConstructorBehavior::kThrow);
-            constructor->Set(name, method, static_cast<v8::PropertyAttribute>(v8::DontEnum | v8::DontDelete | v8::ReadOnly));
-        }
-
-        // TODO: Initialize the function and/or prototype templates here...
 
         template_map.insert(
             std::pair<
@@ -79,7 +71,7 @@ namespace node_sdl2 {
         return scope.Escape(constructor);
     }
 
-    void Window::CreateWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    void Window::js_CreateWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 6) {
@@ -102,14 +94,16 @@ namespace node_sdl2 {
         JS_EXECUTE_RETURN(NOTHING, int, w, info[3]->Int32Value(context));
         JS_EXECUTE_RETURN(NOTHING, int, h, info[4]->Int32Value(context));
         JS_EXECUTE_RETURN(NOTHING, Uint32, flags, info[5]->Uint32Value(context));
-        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Object, jsThis, info.This().As<v8::Function>()->NewInstance(context));
+        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::FunctionTemplate, constructorTemplate, Template(scope.GetIsolate()));
+        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Function, constructor, constructorTemplate->GetFunction(context));
+        JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::Object, jsWindow, constructor->NewInstance(context));
         SDL_ClearError();
         SDL_Window *sdlWindow = SDL_CreateWindow(*title, x, y, w, h, flags);
         auto error = SDL_GetError();
         JS_SDL2_THROW_IF_ERROR(NOTHING, context);
-        Window *window = new Window(context, jsThis, sdlWindow);
-        jsThis->SetAlignedPointerInInternalField(0, window);
-        info.GetReturnValue().Set(jsThis);
+        Window *window = new Window(context, jsWindow, sdlWindow);
+        jsWindow->SetAlignedPointerInInternalField(0, window);
+        info.GetReturnValue().Set(jsWindow);
     }
 
     Window::Window(v8::Local<v8::Context> context, v8::Local<v8::Object> jsThis, SDL_Window *sdlWindow) :
@@ -134,7 +128,7 @@ namespace node_sdl2 {
         delete info.GetParameter();
     }
 
-    void Window::DeleteWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    void Window::js_DeleteWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
 
@@ -162,9 +156,8 @@ namespace node_sdl2 {
         }
     }
 
-    void Window::IsWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    void Window::js_IsWindow(const v8::FunctionCallbackInfo<v8::Value> &info) {
         v8::HandleScope scope(info.GetIsolate());
-        v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
 
         info.GetReturnValue().Set(false);
         if (info.Length() < 1) {
@@ -179,5 +172,26 @@ namespace node_sdl2 {
         }
         Window *window = reinterpret_cast<Window *>(jsThis->GetAlignedPointerFromInternalField(0));
         info.GetReturnValue().Set(window->m_internal != nullptr);
+    }
+
+    void Window::js_Constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
+        v8::HandleScope scope(info.GetIsolate());
+        v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
+
+        if(!info.IsConstructCall()) {
+            JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::String, message, ToString(context, "Class constructor SDL_Window cannot be invoked without 'new'"));
+            scope.GetIsolate()->ThrowException(v8::Exception::TypeError(message));
+            return;
+        }
+
+        if(info.Holder()->InternalFieldCount() < 1) {
+            JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::String, message, ToString(context, "Illegal constructor"));
+            scope.GetIsolate()->ThrowException(v8::Exception::TypeError(message));
+            return;
+        }
+
+        Window *window = new Window(context, info.Holder(), nullptr);
+        info.Holder()->SetAlignedPointerInInternalField(0, window);
+        info.GetReturnValue().Set(info.This());
     }
 }

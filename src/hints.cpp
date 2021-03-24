@@ -18,6 +18,20 @@ namespace node_sdl2 {
         return v8::JustVoid();
     }
 
+    v8::Maybe<void> export_SDL2_Hint(v8::Local<v8::Context> context, v8::Local<v8::Object> exports) {
+        using const_string::operator""_const;
+        v8::Isolate *isolate = context->GetIsolate();
+        v8::HandleScope scope(isolate);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_SetHint, 2);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_SetHintWithPriority, 3);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_GetHint, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_GetHintBoolean, 2);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_SetHintCallback, 2);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_RemoveHintCallback, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_ClearHints, 0);
+        return v8::JustVoid();
+    }
+
     void js_SetHint(const v8::FunctionCallbackInfo<v8::Value> &info) {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();

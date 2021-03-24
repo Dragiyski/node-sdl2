@@ -2,6 +2,7 @@
 #include <SDL.h>
 #include "string-helper.h"
 #include "sdl-helper.h"
+#include "js-helper.h"
 
 namespace node_sdl2 {
     v8::Maybe<void> load_SDL2_INIT(v8::Local<v8::Context> context, v8::Local<v8::Object> target) {
@@ -16,6 +17,18 @@ namespace node_sdl2 {
         JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_INIT", SDL_INIT_EVENTS);
         JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_INIT", SDL_INIT_SENSOR);
         JS_SDL2_DEFINE_ENUM_UNSIGNED(VOID_NOTHING, context, target, "SDL_INIT", SDL_INIT_EVERYTHING);
+        return v8::JustVoid();
+    }
+
+    v8::Maybe<void> export_SDL2_Init(v8::Local<v8::Context> context, v8::Local<v8::Object> exports) {
+        using const_string::operator""_const;
+        v8::Isolate *isolate = context->GetIsolate();
+        v8::HandleScope scope(isolate);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_Init, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_InitSubSystem, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_Quit, 0);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_QuitSubSystem, 1);
+        JS_SDL2_EXPORT_FUNCTION(VOID_NOTHING, "js_", "SDL_", js_WasInit, 1);
         return v8::JustVoid();
     }
 

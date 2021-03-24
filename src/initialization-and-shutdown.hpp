@@ -6,6 +6,7 @@
 
 namespace node_sdl2 {
     v8::Maybe<void> load_SDL2_INIT(v8::Local<v8::Context> context, v8::Local<v8::Object> target);
+    v8::Maybe<void> export_SDL2_Init(v8::Local<v8::Context> context, v8::Local<v8::Object> exports);
     void js_Init(const v8::FunctionCallbackInfo<v8::Value> &info);
     void js_InitSubSystem(const v8::FunctionCallbackInfo<v8::Value> &info);
     void js_WasInit(const v8::FunctionCallbackInfo<v8::Value> &info);

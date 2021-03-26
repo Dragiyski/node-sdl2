@@ -36,13 +36,13 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 2) {
-            JS_THROW_INVALID_ARG_COUNT(info, 2);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 2);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         if (!info[1]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 1, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 1, "string");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         v8::String::Utf8Value value(scope.GetIsolate(), info[1]);
@@ -56,16 +56,16 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 3) {
-            JS_THROW_INVALID_ARG_COUNT(info, 3);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 3);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         if (!info[1]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 1, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 1, "string");
         }
         if (!info[2]->IsInt32()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 2, "int32");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 2, "int32");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         v8::String::Utf8Value value(scope.GetIsolate(), info[1]);
@@ -80,10 +80,10 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 1) {
-            JS_THROW_INVALID_ARG_COUNT(info, 1);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 1);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         SDL_ClearError();
@@ -99,13 +99,13 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 2) {
-            JS_THROW_INVALID_ARG_COUNT(info, 2);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 2);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         if (!info[1]->IsBoolean()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 1, "boolean");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 1, "boolean");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         auto defaultValue = static_cast<SDL_bool>(info[1]->BooleanValue(scope.GetIsolate()));
@@ -221,13 +221,13 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 2) {
-            JS_THROW_INVALID_ARG_COUNT(info, 2);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 2);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         if (!info[1]->IsFunction()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 1, "function");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 1, "function");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         v8::Local<v8::Function> callback = info[1].As<v8::Function>();
@@ -257,10 +257,10 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 1) {
-            JS_THROW_INVALID_ARG_COUNT(info, 1);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 1);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         v8::String::Utf8Value name(scope.GetIsolate(), info[0]);
         v8::Isolate *isolate = scope.GetIsolate();

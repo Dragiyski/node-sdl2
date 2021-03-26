@@ -75,18 +75,18 @@ namespace node_sdl2 {
         v8::HandleScope scope(info.GetIsolate());
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
         if (info.Length() < 6) {
-            JS_THROW_INVALID_ARG_COUNT(info, 6);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 6);
         }
         if (!info[0]->IsString()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "string");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "string");
         }
         for (int i = 1; i < 5; ++i) {
             if (!info[i]->IsInt32()) {
-                JS_THROW_INVALID_ARG_TYPE(info, i, "integer");
+                JS_THROW_INVALID_ARG_TYPE(NOTHING, info, i, "integer");
             }
         }
         if (!info[5]->IsUint32()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 5, "unsigned integer");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 5, "unsigned integer");
         }
         v8::String::Utf8Value title(scope.GetIsolate(), info[0]);
         JS_EXECUTE_RETURN(NOTHING, int, x, info[1]->Int32Value(context));
@@ -133,16 +133,16 @@ namespace node_sdl2 {
         v8::Local<v8::Context> context = scope.GetIsolate()->GetCurrentContext();
 
         if (info.Length() < 1) {
-            JS_THROW_INVALID_ARG_COUNT(info, 1);
+            JS_THROW_INVALID_ARG_COUNT(NOTHING, info, 1);
         }
         if (!info[0]->IsObject()) {
-            JS_THROW_INVALID_ARG_TYPE(info, 0, "[object SDL_Window]");
+            JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "[object SDL_Window]");
         }
         v8::Local<v8::Object> jsThis = info[0].As<v8::Object>();
         if (jsThis->InternalFieldCount() < 1) {
             JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::FunctionTemplate, constructor, Template(scope.GetIsolate()));
             if (!constructor->HasInstance(jsThis)) {
-                JS_THROW_INVALID_ARG_TYPE(info, 0, "[object SDL_Window]");
+                JS_THROW_INVALID_ARG_TYPE(NOTHING, info, 0, "[object SDL_Window]");
             } else {
                 JS_EXECUTE_RETURN_HANDLE(NOTHING, v8::String, message, ToDetailString(context, "Object ", jsThis, " is not valid SDL_Window"));
             }
